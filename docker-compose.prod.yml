@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: ghcr.io/${GITHUB_REPOSITORY}/grocery-nginx:${IMAGE_TAG}
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+
+  gateway:
+    image: ghcr.io/${GITHUB_REPOSITORY}/grocery-gateway:${IMAGE_TAG}
+    environment:
+      GATEWAY_PORT: 3000
+      PRODUCT_SERVICE_HOST: product-service
+      PRODUCT_SERVICE_PORT: 4001
+    depends_on:
+      - product-service
+
+  product-service:
+    image: ghcr.io/${GITHUB_REPOSITORY}/grocery-product-service:${IMAGE_TAG}
+    environment:
+      PRODUCT_SERVICE_HOST: 0.0.0.0
+      PRODUCT_SERVICE_PORT: 4001
+      SUPABASE_URL_PRODUCT: ${SUPABASE_URL_PRODUCT}
+      SUPABASE_SERVICE_ROLE_KEY_PRODUCT: ${SUPABASE_SERVICE_ROLE_KEY_PRODUCT}
+      SUPABASE_PRODUCTS_TABLE: ${SUPABASE_PRODUCTS_TABLE:-products}
+
+  user-service:
+    image: ghcr.io/${GITHUB_REPOSITORY}/grocery-user-service:${IMAGE_TAG}
+    environment:
+      USER_SERVICE_HOST: 0.0.0.0
+      USER_SERVICE_PORT: 4002
+      SUPABASE_URL_USER: ${SUPABASE_URL_USER}
+      SUPABASE_SERVICE_ROLE_KEY_USER: ${SUPABASE_SERVICE_ROLE_KEY_USER}
+
+  order-service:
+    image: ghcr.io/${GITHUB_REPOSITORY}/grocery-order-service:${IMAGE_TAG}
+    environment:
+      ORDER_SERVICE_HOST: 0.0.0.0
+      ORDER_SERVICE_PORT: 4003
+      SUPABASE_URL_ORDER: ${SUPABASE_URL_ORDER}
+      SUPABASE_SERVICE_ROLE_KEY_ORDER: ${SUPABASE_SERVICE_ROLE_KEY_ORDER}

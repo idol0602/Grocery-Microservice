@@ -1,0 +1,36 @@
+{
+  "name": "grocery-microservices",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:gateway": "node dist/app/gateway/src/main.js",
+    "start:product": "node dist/app/services/product-service/src/main.js",
+    "start:user": "node dist/app/services/user-service/src/main.js",
+    "start:order": "node dist/app/services/order-service/src/main.js",
+    "start:dev:gateway": "ts-node-dev --respawn --transpile-only app/gateway/src/main.ts",
+    "start:dev:product": "ts-node-dev --respawn --transpile-only app/services/product-service/src/main.ts",
+    "start:dev:user": "ts-node-dev --respawn --transpile-only app/services/user-service/src/main.ts",
+    "start:dev:order": "ts-node-dev --respawn --transpile-only app/services/order-service/src/main.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.17",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.1.17",
+    "@nestjs/microservices": "^11.1.17",
+    "@nestjs/platform-express": "^11.1.17",
+    "@supabase/supabase-js": "^2.99.3",
+    "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/node": "^24.7.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}

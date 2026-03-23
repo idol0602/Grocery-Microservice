@@ -1,0 +1,56 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: grocery-nginx
+    depends_on:
+      - gateway
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    container_name: grocery-gateway
+    environment:
+      GATEWAY_PORT: 3000
+      PRODUCT_SERVICE_HOST: product-service
+      PRODUCT_SERVICE_PORT: 4001
+    depends_on:
+      - product-service
+
+  product-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.product
+    container_name: grocery-product-service
+    environment:
+      PRODUCT_SERVICE_HOST: 0.0.0.0
+      PRODUCT_SERVICE_PORT: 4001
+      SUPABASE_URL_PRODUCT: ${SUPABASE_URL_PRODUCT}
+      SUPABASE_SERVICE_ROLE_KEY_PRODUCT: ${SUPABASE_SERVICE_ROLE_KEY_PRODUCT}
+      SUPABASE_PRODUCTS_TABLE: ${SUPABASE_PRODUCTS_TABLE:-products}
+
+  user-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    container_name: grocery-user-service
+    environment:
+      USER_SERVICE_HOST: 0.0.0.0
+      USER_SERVICE_PORT: 4002
+      SUPABASE_URL_USER: ${SUPABASE_URL_USER}
+      SUPABASE_SERVICE_ROLE_KEY_USER: ${SUPABASE_SERVICE_ROLE_KEY_USER}
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.order
+    container_name: grocery-order-service
+    environment:
+      ORDER_SERVICE_HOST: 0.0.0.0
+      ORDER_SERVICE_PORT: 4003
+      SUPABASE_URL_ORDER: ${SUPABASE_URL_ORDER}
+      SUPABASE_SERVICE_ROLE_KEY_ORDER: ${SUPABASE_SERVICE_ROLE_KEY_ORDER}
