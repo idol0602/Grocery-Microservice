@@ -3,7 +3,7 @@ name: Build and Deploy to Oracle VPS
 on:
   push:
     branches:
-      - main
+      - production
 
 permissions:
   contents: read
