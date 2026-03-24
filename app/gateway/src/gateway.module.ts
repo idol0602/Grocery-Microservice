@@ -4,6 +4,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HealthController } from './health.controller';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { CategoriesController } from './categories.controller';
+import { CategoriesService } from './categories.service';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { ProductsService } from './products.service';
       },
     ]),
   ],
-  controllers: [HealthController, ProductsController],
-  providers: [ProductsService],
+  controllers: [HealthController, ProductsController, CategoriesController],
+  providers: [ProductsService, CategoriesService],
 })
 export class GatewayModule {}
