@@ -15,6 +15,11 @@ type UserRow = {
     is_active  : boolean
 }
 
+@Injectable()
 export class UserService implements OnModuleInit {
     private tableName = 'users';
-}.
+
+    onModuleInit() {
+      // Initialization logic if needed
+    }
+}
