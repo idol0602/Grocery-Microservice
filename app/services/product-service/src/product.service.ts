@@ -39,18 +39,13 @@ export class ProductService implements OnModuleInit {
 
     const { data, error } = await supabase
       .from(this.tableName)
-      .select('id,name,price,image_url')
+      .select('*')
       .order('name', { ascending: true });
 
     if (error) {
       throw new InternalServerErrorException(error.message);
     }
 
-    return (data as ProductRow[]).map((item) => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      image_url: item.image_url ?? undefined,
-    }));
+    return data as ProductRow[];
   }
 }
