@@ -4,9 +4,14 @@ import { firstValueFrom, timeout } from 'rxjs';
 
 type ProductDto = {
   id: string;
+  category_id: string;
   name: string;
   price: number;
-  image_url?: string;
+  stock: number;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+  is_active: boolean;
 };
 
 @Injectable()
