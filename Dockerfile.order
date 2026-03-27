@@ -17,6 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./dist
+COPY lib ./lib
 
 EXPOSE 4003
 CMD ["node", "dist/app/services/order-service/src/main.js"]
