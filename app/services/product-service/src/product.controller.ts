@@ -1,5 +1,5 @@
-import { Controller } from '@nestjs/common';
-import { Crud, CrudController } from '@nestjsx/crud';
+import { Controller, UseInterceptors } from '@nestjs/common';
+import { Crud, CrudController, CrudRequestInterceptor } from '@nestjsx/crud';
 import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
 
@@ -23,6 +23,7 @@ import { ProductService } from './product.service';
   },
 })
 @Controller('products')
+@UseInterceptors(CrudRequestInterceptor)
 export class ProductController implements CrudController<Product> {
   constructor(public service: ProductService) {}
 }
