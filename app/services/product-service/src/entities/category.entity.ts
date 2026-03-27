@@ -9,9 +9,9 @@ export class Category {
   @PrimaryGeneratedColumn('increment')
   id!: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'text' })
   name!: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Column({ type: 'text', unique: true })
   slug!: string;
 }
