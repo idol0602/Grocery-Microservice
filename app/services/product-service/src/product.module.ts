@@ -25,7 +25,10 @@ import { Category } from './entities/category.entity';
         entities: [Product, Category],
         synchronize: config.get<boolean>('DB_SYNCHRONIZE'),
         logging: config.get<boolean>('DB_LOGGING'),
-        ssl: { rejectUnauthorized: false },
+        ssl: true,
+        extra: {
+          sslmode: 'require',
+        },
       }),
     }),
     TypeOrmModule.forFeature([Product, Category]),
