@@ -31,4 +31,18 @@ export class ProductService implements OnModuleInit {
     }
     return data as ProductRow[];
   }
+
+  async findById(id: string) {
+    const { data, error } = await this.supabase
+      .from(PRODUCT_SERVICE_TABLES.PRODUCTS)
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+
+    return data as ProductRow;
+  }
 }

@@ -34,4 +34,18 @@ export class ProductsService {
       );
     }
   }
+
+  async getById(id: string): Promise<ProductDto> {
+    try {
+      return await firstValueFrom(
+        this.productClient
+          .send({ cmd: 'product.findById' }, { id })
+          .pipe(timeout(5000)),
+      );
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Cannot fetch product from product-service',
+      );
+    }
+  }
 }
