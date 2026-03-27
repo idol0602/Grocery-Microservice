@@ -1,25 +1,22 @@
 import { NestFactory } from '@nestjs/core';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common';
 import { ProductModule } from './product.module';
 
 async function bootstrap() {
-  const host = process.env.PRODUCT_SERVICE_HOST ?? '0.0.0.0';
-  const port = Number(process.env.PRODUCT_SERVICE_PORT ?? 4001);
+  const app = await NestFactory.create(ProductModule);
 
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    ProductModule,
-    {
-      transport: Transport.TCP,
-      options: {
-        host,
-        port,
-      },
-    },
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
   );
 
-  await app.listen();
+  const port = Number(process.env.PRODUCT_SERVICE_PORT ?? 4001);
+  await app.listen(port, '0.0.0.0');
   // eslint-disable-next-line no-console
-  console.log(`Product service listening on ${host}:${port}`);
+  console.log(`Product service running on port ${port}`);
 }
 
 void bootstrap();

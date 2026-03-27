@@ -1,46 +1,28 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern } from '@nestjs/microservices';
+import { Crud, CrudController } from '@nestjsx/crud';
+import { Product } from './entities/product.entity';
 import { ProductService } from './product.service';
-import { ProductRow } from '../../../../lib/common/src/types/product.type';
 
-@Controller()
-export class ProductController {
-  constructor(private readonly productService: ProductService) {}
-
-  @MessagePattern({ cmd: 'products.findAll' })
-  async findAll() {
-    return this.productService.findAll();
-  }
-
-  @MessagePattern({ cmd: 'product.findById' })
-  async findById(data: { id: string }) {
-    const { id } = data;
-    return this.productService.findById(id);
-  }
-
-  @MessagePattern({ cmd: 'product.create' })
-  async create(productData: ProductRow) {
-    return this.productService.create(productData);
-  }
-
-  @MessagePattern({ cmd: 'product.update' })
-  async update(data: { id: string; productData: ProductRow }) {
-    const { id, productData } = data;
-    return this.productService.update(id, productData);
-  }
-
-  @MessagePattern({ cmd: 'product.delete' })
-  async delete(data: { id: string }) {
-    const { id } = data;
-    return this.productService.delete(id);
-  }
-
-  @MessagePattern({ cmd: 'health' })
-  health() {
-    return {
-      service: 'product-service',
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-    };
-  }
+@Crud({
+  model: { type: Product },
+  routes: {
+    exclude: ['replaceOneBase', 'createManyBase'],
+  },
+  query: {
+    alwaysPaginate: true,
+    limit: 10,
+    maxLimit: 100,
+    cache: 2000, // cache 2 giây
+  },
+  params: {
+    id: {
+      field: 'id',
+      type: 'uuid',
+      primary: true,
+    },
+  },
+})
+@Controller('products')
+export class ProductController implements CrudController<Product> {
+  constructor(public service: ProductService) {}
 }
