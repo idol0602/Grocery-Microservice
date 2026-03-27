@@ -15,20 +15,25 @@ import { Category } from './entities/category.entity';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('PRODUCT_DB_HOST'),
-        port: config.get<number>('PRODUCT_DB_PORT'),
-        username: config.get<string>('PRODUCT_DB_USER'),
-        password: config.get<string>('PRODUCT_DB_PASSWORD'),
-        database: config.get<string>('PRODUCT_DB_NAME'),
-        entities: [Product, Category],
-        synchronize: config.get<boolean>('DB_SYNCHRONIZE'),
-        logging: config.get<boolean>('DB_LOGGING'),
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const synchronize = config.get<string>('DB_SYNCHRONIZE', 'false') === 'true';
+        const logging = config.get<string>('DB_LOGGING', 'false') === 'true';
+
+        return {
+          type: 'postgres',
+          host: config.get<string>('PRODUCT_DB_HOST'),
+          port: config.get<number>('PRODUCT_DB_PORT'),
+          username: config.get<string>('PRODUCT_DB_USER'),
+          password: config.get<string>('PRODUCT_DB_PASSWORD'),
+          database: config.get<string>('PRODUCT_DB_NAME'),
+          entities: [Product, Category],
+          synchronize,
+          logging,
+          ssl: {
+            rejectUnauthorized: false,
+          },
+        };
+      },
     }),
     TypeOrmModule.forFeature([Product, Category]),
   ],
