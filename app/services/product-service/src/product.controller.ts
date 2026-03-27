@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { ProductService } from './product.service';
+import { ProductRow } from './types/product.type';
 
 @Controller()
 export class ProductController {
@@ -15,6 +16,23 @@ export class ProductController {
   async findById(data: { id: string }) {
     const { id } = data;
     return this.productService.findById(id);
+  }
+
+  @MessagePattern({ cmd: 'product.create' })
+  async create(productData: ProductRow) {
+    return this.productService.create(productData);
+  }
+
+  @MessagePattern({ cmd: 'product.update' })
+  async update(data: { id: string; productData: ProductRow }) {
+    const { id, productData } = data;
+    return this.productService.update(id, productData);
+  }
+
+  @MessagePattern({ cmd: 'product.delete' })
+  async delete(data: { id: string }) {
+    const { id } = data;
+    return this.productService.delete(id);
   }
 
   @MessagePattern({ cmd: 'health' })
