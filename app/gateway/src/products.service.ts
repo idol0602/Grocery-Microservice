@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
-import { ProductDto } from './types/product.type';
+import { ProductRow } from '../../../lib/common/src/types/product.type';
 import {ApiResponse} from "../../../lib/common/response.util"
 
 @Injectable()
@@ -15,7 +15,7 @@ export class ProductsService {
     try {
       const response = await firstValueFrom(
         this.productClient
-          .send<ApiResponse<ProductDto[]>>({ cmd: 'products.findAll' }, {})
+          .send<ApiResponse<ProductRow[]>>({ cmd: 'products.findAll' }, {})
           .pipe(timeout(5000)),
       );
       
@@ -35,7 +35,7 @@ export class ProductsService {
     try {
       const response = await firstValueFrom(
         this.productClient
-          .send<ApiResponse<ProductDto>>({ cmd: 'product.findById' }, { id })
+          .send<ApiResponse<ProductRow>>({ cmd: 'product.findById' }, { id })
           .pipe(timeout(5000)),
       );
       
@@ -55,7 +55,7 @@ export class ProductsService {
     try {
       const response = await firstValueFrom(
         this.productClient
-          .send<ApiResponse<ProductDto>>({ cmd: 'product.create' }, productData)
+          .send<ApiResponse<ProductRow>>({ cmd: 'product.create' }, productData)
           .pipe(timeout(5000)),
       );
       
@@ -75,7 +75,7 @@ export class ProductsService {
     try {
       const response = await firstValueFrom(
         this.productClient
-          .send<ApiResponse<ProductDto>>({ cmd: 'product.update' }, { id, productData })
+          .send<ApiResponse<ProductRow>>({ cmd: 'product.update' }, { id, productData })
           .pipe(timeout(5000)),
       );
       

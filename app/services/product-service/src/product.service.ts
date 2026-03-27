@@ -6,7 +6,7 @@ import {
 import { getSupabaseClient } from '../../../../lib/common/src/database/supabase.client';
 import { PRODUCT_SERVICE_TABLES } from './const/tables';
 import { ApiResponse, STATUS_CODE } from '../../../../lib/common/response.util';
-import {ProductRow} from './types/product.type';
+import {ProductRow} from '../../../../lib/common/src/types/product.type';
 
 @Injectable()
 export class ProductService implements OnModuleInit {

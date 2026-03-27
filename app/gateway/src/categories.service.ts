@@ -2,7 +2,7 @@ import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
 import {ApiResponse} from "../../../lib/common/response.util"
-import { CategoryDto } from './types/category.type';
+import { CategoryRow } from '../../../lib/common/src/types/category.type';
 
 @Injectable()
 export class CategoriesService {
@@ -15,7 +15,7 @@ export class CategoriesService {
     try {
       const response = await firstValueFrom(
         this.productClient
-          .send<ApiResponse<CategoryDto[]>>({ cmd: 'categories.findAll' }, {})
+          .send<ApiResponse<CategoryRow[]>>({ cmd: 'categories.findAll' }, {})
           .pipe(timeout(5000)),
       );
       
