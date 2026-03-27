@@ -9,4 +9,9 @@ export class ProductsController {
   async getProducts() {
     return this.productsService.getProducts();
   }
+
+  @Get(':id')
+  async getProductById(id: string) {
+    return this.productsService.getById(id);
+  }
 }

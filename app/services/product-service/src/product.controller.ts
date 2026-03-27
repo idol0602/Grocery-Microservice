@@ -11,6 +11,12 @@ export class ProductController {
     return this.productService.findAll();
   }
 
+  @MessagePattern({ cmd: 'product.findById' })
+  async findById(data: { id: string }) {
+    const { id } = data;
+    return this.productService.findById(id);
+  }
+
   @MessagePattern({ cmd: 'health' })
   health() {
     return {
