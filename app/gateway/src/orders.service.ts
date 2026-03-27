@@ -1,108 +1,62 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
-import { ApiResponse } from '../../../lib/common/response.util';
-import { OrderRow } from '../../../lib/common/src/types/order.type';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
+  private readonly baseUrl: string;
+
   constructor(
-    @Inject('ORDER_SERVICE')
-    private readonly orderClient: ClientProxy,
-  ) {}
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    const host = this.configService.get<string>('ORDER_SERVICE_HOST', 'order-service');
+    const port = this.configService.get<string>('ORDER_SERVICE_PORT', '4003');
+    this.baseUrl = `http://${host}:${port}/orders`;
+  }
 
   async getOrders() {
     try {
-      const response = await firstValueFrom(
-        this.orderClient
-          .send<ApiResponse<OrderRow[]>>({ cmd: 'orders.findAll' }, {})
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from order-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch orders from order-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch orders from order-service');
     }
   }
 
   async getById(id: string) {
     try {
-      const response = await firstValueFrom(
-        this.orderClient
-          .send<ApiResponse<OrderRow>>({ cmd: 'order.findById' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from order-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.get(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch order from order-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch order from order-service');
     }
   }
 
   async createOrder(orderData: any) {
     try {
-      const response = await firstValueFrom(
-        this.orderClient
-          .send<ApiResponse<OrderRow>>({ cmd: 'order.create' }, orderData)
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from order-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.post(this.baseUrl, orderData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot create order in order-service: ${message}`);
+      throw new InternalServerErrorException('Cannot create order in order-service');
     }
   }
 
   async updateOrder(id: string, orderData: any) {
     try {
-      const response = await firstValueFrom(
-        this.orderClient
-          .send<ApiResponse<OrderRow>>({ cmd: 'order.update' }, { id, orderData })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from order-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.patch(`${this.baseUrl}/${id}`, orderData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot update order in order-service: ${message}`);
+      throw new InternalServerErrorException('Cannot update order in order-service');
     }
   }
 
   async deleteOrder(id: string) {
     try {
-      const response = await firstValueFrom(
-        this.orderClient
-          .send<ApiResponse<null>>({ cmd: 'order.delete' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || response.statusCode >= 400) {
-        throw new InternalServerErrorException('Failed to delete order');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.delete(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot delete order from order-service: ${message}`);
+      throw new InternalServerErrorException('Cannot delete order from order-service');
     }
   }
 }

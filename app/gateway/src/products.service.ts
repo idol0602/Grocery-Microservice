@@ -1,34 +1,24 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { ProductRow } from '../../../lib/common/src/types/product.type';
 
-// Reusing the ApiResponse concept since original TCP service used it
-// even though @nestjsx/crud returns raw data. We will wrap the response.
 @Injectable()
 export class ProductsService {
-  private readonly productUrl: string;
+  private readonly baseUrl: string;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
     const host = this.configService.get<string>('PRODUCT_SERVICE_HOST', 'product-service');
     const port = this.configService.get<string>('PRODUCT_SERVICE_PORT', '4001');
-    this.productUrl = `http://${host}:${port}/products`;
-  }
-
-  private wrapResponse(data: any, defaultMessage: string = 'Success') {
-    return {
-      data: data,
-      statusCode: 200,
-      message: defaultMessage,
-    };
+    this.baseUrl = `http://${host}:${port}/products`;
   }
 
   async getProducts() {
     try {
-      const res = await fetch(this.productUrl);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const rawData = await res.json();
-      // @nestjsx/crud returns { data: [], total: number, ... } for paginated
-      return this.wrapResponse(rawData, 'Lấy danh sách sản phẩm thành công');
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot fetch products from product-service');
     }
@@ -36,10 +26,8 @@ export class ProductsService {
 
   async getById(id: string) {
     try {
-      const res = await fetch(`${this.productUrl}/${id}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const rawData = await res.json();
-      return this.wrapResponse(rawData, 'Lấy sản phẩm thành công');
+      const { data } = await this.httpService.axiosRef.get(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot fetch product from product-service');
     }
@@ -47,14 +35,8 @@ export class ProductsService {
 
   async createProduct(productData: any) {
     try {
-      const res = await fetch(this.productUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-      });
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const rawData = await res.json();
-      return this.wrapResponse(rawData, 'Tạo sản phẩm thành công');
+      const { data } = await this.httpService.axiosRef.post(this.baseUrl, productData);
+      return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot create product in product-service');
     }
@@ -62,15 +44,8 @@ export class ProductsService {
 
   async updateProduct(id: string, productData: any) {
     try {
-      // @nestjsx/crud uses PATCH for updates
-      const res = await fetch(`${this.productUrl}/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-      });
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const rawData = await res.json();
-      return this.wrapResponse(rawData, 'Cập nhật sản phẩm thành công');
+      const { data } = await this.httpService.axiosRef.patch(`${this.baseUrl}/${id}`, productData);
+      return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot update product in product-service');
     }
@@ -78,11 +53,8 @@ export class ProductsService {
 
   async deleteProduct(id: string) {
     try {
-      const res = await fetch(`${this.productUrl}/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      return this.wrapResponse(null, 'Xóa sản phẩm thành công');
+      const { data } = await this.httpService.axiosRef.delete(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot delete product in product-service');
     }

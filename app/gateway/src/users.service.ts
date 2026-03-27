@@ -1,108 +1,62 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
-import { ApiResponse } from '../../../lib/common/response.util';
-import { UserRow } from '../../../lib/common/src/types/user.type';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
+  private readonly baseUrl: string;
+
   constructor(
-    @Inject('USER_SERVICE')
-    private readonly userClient: ClientProxy,
-  ) {}
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    const host = this.configService.get<string>('USER_SERVICE_HOST', 'user-service');
+    const port = this.configService.get<string>('USER_SERVICE_PORT', '4002');
+    this.baseUrl = `http://${host}:${port}/users`;
+  }
 
   async getUsers() {
     try {
-      const response = await firstValueFrom(
-        this.userClient
-          .send<ApiResponse<UserRow[]>>({ cmd: 'users.findAll' }, {})
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from user-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch users from user-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch users from user-service');
     }
   }
 
   async getById(id: string) {
     try {
-      const response = await firstValueFrom(
-        this.userClient
-          .send<ApiResponse<UserRow>>({ cmd: 'user.findById' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from user-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.get(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch user from user-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch user from user-service');
     }
   }
 
   async createUser(userData: any) {
     try {
-      const response = await firstValueFrom(
-        this.userClient
-          .send<ApiResponse<UserRow>>({ cmd: 'user.create' }, userData)
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from user-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.post(this.baseUrl, userData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot create user in user-service: ${message}`);
+      throw new InternalServerErrorException('Cannot create user in user-service');
     }
   }
 
   async updateUser(id: string, userData: any) {
     try {
-      const response = await firstValueFrom(
-        this.userClient
-          .send<ApiResponse<UserRow>>({ cmd: 'user.update' }, { id, userData })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from user-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.patch(`${this.baseUrl}/${id}`, userData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot update user in user-service: ${message}`);
+      throw new InternalServerErrorException('Cannot update user in user-service');
     }
   }
 
   async deleteUser(id: string) {
     try {
-      const response = await firstValueFrom(
-        this.userClient
-          .send<ApiResponse<null>>({ cmd: 'user.delete' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || response.statusCode >= 400) {
-        throw new InternalServerErrorException('Failed to delete user');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.delete(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot delete user from user-service: ${message}`);
+      throw new InternalServerErrorException('Cannot delete user from user-service');
     }
   }
 }

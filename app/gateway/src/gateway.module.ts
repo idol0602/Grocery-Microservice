@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 import { HealthController } from './health.controller';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
@@ -16,30 +16,10 @@ import { OrdersService } from './orders.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ClientsModule.registerAsync([
-      {
-        name: 'USER_SERVICE',
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: config.get<string>('USER_SERVICE_HOST', 'user-service'),
-            port: Number(config.get<string>('USER_SERVICE_PORT', '4002')),
-          },
-        }),
-      },
-      {
-        name: 'ORDER_SERVICE',
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: config.get<string>('ORDER_SERVICE_HOST', 'order-service'),
-            port: Number(config.get<string>('ORDER_SERVICE_PORT', '4003')),
-          },
-        }),
-      },
-    ]),
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 3,
+    }),
   ],
   controllers: [
     HealthController,
