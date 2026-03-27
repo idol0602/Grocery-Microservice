@@ -1,18 +1,8 @@
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
-
-type ProductDto = {
-  id: string;
-  category_id: string;
-  name: string;
-  price: number;
-  stock: number;
-  description: string | null;
-  image_url: string | null;
-  created_at: string;
-  is_active: boolean;
-};
+import { ProductDto } from './types/product.type';
+import {ApiResponse} from "@/lib/common/response.util"
 
 @Injectable()
 export class ProductsService {
@@ -21,13 +11,19 @@ export class ProductsService {
     private readonly productClient: ClientProxy,
   ) {}
 
-  async getProducts(): Promise<ProductDto[]> {
+  async getProducts() {
     try {
-      return await firstValueFrom(
+      const response = await firstValueFrom(
         this.productClient
-          .send<ProductDto[]>({ cmd: 'products.findAll' }, {})
+          .send<ApiResponse<ProductDto[]>>({ cmd: 'products.findAll' }, {})
           .pipe(timeout(5000)),
       );
+      
+      if (!response || !response.data) {
+        throw new InternalServerErrorException('Invalid response from product-service');
+      }
+      
+      return response;
     } catch {
       throw new InternalServerErrorException(
         'Cannot fetch products from product-service',
@@ -35,16 +31,82 @@ export class ProductsService {
     }
   }
 
-  async getById(id: string): Promise<ProductDto> {
+  async getById(id: string) {
     try {
-      return await firstValueFrom(
+      const response = await firstValueFrom(
         this.productClient
-          .send({ cmd: 'product.findById' }, { id })
+          .send<ApiResponse<ProductDto>>({ cmd: 'product.findById' }, { id })
           .pipe(timeout(5000)),
       );
+      
+      if (!response || !response.data) {
+        throw new InternalServerErrorException('Invalid response from product-service');
+      }
+      
+      return response;
     } catch (error) {
       throw new InternalServerErrorException(
         'Cannot fetch product from product-service',
+      );
+    }
+  }
+
+  async createProduct(productData: any) {
+    try {
+      const response = await firstValueFrom(
+        this.productClient
+          .send<ApiResponse<ProductDto>>({ cmd: 'product.create' }, productData)
+          .pipe(timeout(5000)),
+      );
+      
+      if (!response || !response.data) {
+        throw new InternalServerErrorException('Invalid response from product-service');
+      }
+      
+      return response;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Cannot create product in product-service',
+      );
+    }
+  }
+
+  async updateProduct(id: string, productData: any) {
+    try {
+      const response = await firstValueFrom(
+        this.productClient
+          .send<ApiResponse<ProductDto>>({ cmd: 'product.update' }, { id, productData })
+          .pipe(timeout(5000)),
+      );
+      
+      if (!response || !response.data) {
+        throw new InternalServerErrorException('Invalid response from product-service');
+      }
+      
+      return response;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Cannot update product in product-service',
+      );
+    }
+  }
+
+  async deleteProduct(id: string) {
+    try {
+      const response = await firstValueFrom(
+        this.productClient
+          .send<ApiResponse<any>>({ cmd: 'product.delete' }, { id })
+          .pipe(timeout(5000)),
+      );
+      
+      if (!response || response.statusCode >= 400) {
+        throw new InternalServerErrorException('Failed to delete product');
+      }
+      
+      return response;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Cannot delete product in product-service',
       );
     }
   }

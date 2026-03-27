@@ -1,4 +1,4 @@
-export type ProductRow = {
+export type ProductDto = {
   id: string;
   category_id: string;
   name: string;
