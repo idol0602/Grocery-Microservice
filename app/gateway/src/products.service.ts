@@ -15,9 +15,9 @@ export class ProductsService {
     this.baseUrl = `http://${host}:${port}/products`;
   }
 
-  async getProducts() {
+  async getProducts(query?: any) {
     try {
-      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl, { params: query });
       return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot fetch products from product-service');

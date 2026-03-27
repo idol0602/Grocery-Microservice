@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Delete, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductRow } from '../../../lib/common/src/types/product.type';
 
@@ -7,8 +7,8 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async getProducts() {
-    return this.productsService.getProducts();
+  async getProducts(@Query() query: any) {
+    return this.productsService.getProducts(query);
   }
 
   @Get(':id')

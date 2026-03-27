@@ -15,9 +15,9 @@ export class CategoriesService {
     this.baseUrl = `http://${host}:${port}/categories`;
   }
 
-  async getCategories() {
+  async getCategories(query?: any) {
     try {
-      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl, { params: query });
       return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot fetch categories from product-service');

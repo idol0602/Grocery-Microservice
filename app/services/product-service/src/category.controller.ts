@@ -1,5 +1,5 @@
-import { Controller } from '@nestjs/common';
-import { Crud, CrudController } from '@nestjsx/crud';
+import { Controller, UseInterceptors } from '@nestjs/common';
+import { Crud, CrudController, CrudRequestInterceptor } from '@nestjsx/crud';
 import { Category } from './entities/category.entity';
 import { CategoryService } from './category.service';
 
@@ -22,6 +22,7 @@ import { CategoryService } from './category.service';
   },
 })
 @Controller('categories')
+@UseInterceptors(CrudRequestInterceptor)
 export class CategoryController implements CrudController<Category> {
   constructor(public service: CategoryService) {}
 }

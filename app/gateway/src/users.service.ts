@@ -15,9 +15,9 @@ export class UsersService {
     this.baseUrl = `http://${host}:${port}/users`;
   }
 
-  async getUsers() {
+  async getUsers(query?: any) {
     try {
-      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl, { params: query });
       return data;
     } catch (error) {
       throw new InternalServerErrorException('Cannot fetch users from user-service');

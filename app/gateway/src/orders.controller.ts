@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Delete, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrderRow } from '../../../lib/common/src/types/order.type';
 
@@ -7,8 +7,8 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  async getOrders() {
-    return this.ordersService.getOrders();
+  async getOrders(@Query() query: any) {
+    return this.ordersService.getOrders(query);
   }
 
   @Get(':id')
