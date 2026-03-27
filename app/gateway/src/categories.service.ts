@@ -1,108 +1,62 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout } from 'rxjs';
-import {ApiResponse} from "../../../lib/common/response.util"
-import { CategoryRow } from '../../../lib/common/src/types/product.type';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CategoriesService {
+  private readonly baseUrl: string;
+
   constructor(
-    @Inject('PRODUCT_SERVICE')
-    private readonly productClient: ClientProxy,
-  ) {}
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    const host = this.configService.get<string>('PRODUCT_SERVICE_HOST', 'product-service');
+    const port = this.configService.get<string>('PRODUCT_SERVICE_PORT', '4001');
+    this.baseUrl = `http://${host}:${port}/categories`;
+  }
 
   async getCategories() {
     try {
-      const response = await firstValueFrom(
-        this.productClient
-          .send<ApiResponse<CategoryRow[]>>({ cmd: 'categories.findAll' }, {})
-          .pipe(timeout(5000)),
-      );
-      
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from product-service');
-      }
-      
-      return response;
+      const { data } = await this.httpService.axiosRef.get(this.baseUrl);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch categories from product-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch categories from product-service');
     }
   }
 
   async getById(id: number) {
     try {
-      const response = await firstValueFrom(
-        this.productClient
-          .send<ApiResponse<CategoryRow>>({ cmd: 'category.findById' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from product-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.get(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot fetch category from product-service: ${message}`);
+      throw new InternalServerErrorException('Cannot fetch category from product-service');
     }
   }
 
   async createCategory(categoryData: any) {
     try {
-      const response = await firstValueFrom(
-        this.productClient
-          .send<ApiResponse<CategoryRow>>({ cmd: 'category.create' }, categoryData)
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from product-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.post(this.baseUrl, categoryData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot create category in product-service: ${message}`);
+      throw new InternalServerErrorException('Cannot create category in product-service');
     }
   }
 
   async updateCategory(id: number, categoryData: any) {
     try {
-      const response = await firstValueFrom(
-        this.productClient
-          .send<ApiResponse<CategoryRow>>({ cmd: 'category.update' }, { id, categoryData })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || !response.data) {
-        throw new InternalServerErrorException('Invalid response from product-service');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.patch(`${this.baseUrl}/${id}`, categoryData);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot update category in product-service: ${message}`);
+      throw new InternalServerErrorException('Cannot update category in product-service');
     }
   }
 
   async deleteCategory(id: number) {
     try {
-      const response = await firstValueFrom(
-        this.productClient
-          .send<ApiResponse<null>>({ cmd: 'category.delete' }, { id })
-          .pipe(timeout(5000)),
-      );
-
-      if (!response || response.statusCode >= 400) {
-        throw new InternalServerErrorException('Failed to delete category');
-      }
-
-      return response;
+      const { data } = await this.httpService.axiosRef.delete(`${this.baseUrl}/${id}`);
+      return data;
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(`Cannot delete category from product-service: ${message}`);
+      throw new InternalServerErrorException('Cannot delete category from product-service');
     }
   }
 }
