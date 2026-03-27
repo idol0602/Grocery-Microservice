@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/
 import { getSupabaseClient } from '../../../../lib/common/src/database/supabase.client';
 import { PRODUCT_SERVICE_TABLES } from './const/tables';
 import { CategoryRow } from './types/category.type';
-import { ApiResponse, STATUS_CODE } from '@/lib/common/response.util';
+import { ApiResponse, STATUS_CODE } from '../../../../lib/common/response.util';
 
 @Injectable()
 export class CategoryService implements OnModuleInit {
