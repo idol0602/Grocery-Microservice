@@ -28,6 +28,7 @@ import { Category } from './entities/category.entity';
         ssl: true,
         extra: {
           sslmode: 'require',
+          family: 4, // IPv4 only, không dùng IPv6
         },
       }),
     }),
