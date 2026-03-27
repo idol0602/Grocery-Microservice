@@ -21,8 +21,14 @@ services:
       GATEWAY_PORT: 3000
       PRODUCT_SERVICE_HOST: product-service
       PRODUCT_SERVICE_PORT: 4001
+      USER_SERVICE_HOST: user-service
+      USER_SERVICE_PORT: 4002
+      ORDER_SERVICE_HOST: order-service
+      ORDER_SERVICE_PORT: 4003
     depends_on:
       - product-service
+      - user-service
+      - order-service
 
   product-service:
     build:

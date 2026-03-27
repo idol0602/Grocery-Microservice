@@ -18,17 +18,6 @@ import { OrdersService } from './orders.service';
     }),
     ClientsModule.registerAsync([
       {
-        name: 'PRODUCT_SERVICE',
-        inject: [ConfigService],
-        useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
-          options: {
-            host: config.get<string>('PRODUCT_SERVICE_HOST', 'product-service'),
-            port: Number(config.get<string>('PRODUCT_SERVICE_PORT', '4001')),
-          },
-        }),
-      },
-      {
         name: 'USER_SERVICE',
         inject: [ConfigService],
         useFactory: (config: ConfigService) => ({

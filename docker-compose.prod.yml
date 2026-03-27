@@ -14,17 +14,26 @@ services:
       GATEWAY_PORT: 3000
       PRODUCT_SERVICE_HOST: product-service
       PRODUCT_SERVICE_PORT: 4001
+      USER_SERVICE_HOST: user-service
+      USER_SERVICE_PORT: 4002
+      ORDER_SERVICE_HOST: order-service
+      ORDER_SERVICE_PORT: 4003
     depends_on:
       - product-service
+      - user-service
+      - order-service
 
   product-service:
     image: ghcr.io/${GITHUB_REPOSITORY}/grocery-product-service:${IMAGE_TAG}
     environment:
       PRODUCT_SERVICE_HOST: 0.0.0.0
       PRODUCT_SERVICE_PORT: 4001
-      SUPABASE_URL_PRODUCT: ${SUPABASE_URL_PRODUCT}
-      SUPABASE_SERVICE_ROLE_KEY_PRODUCT: ${SUPABASE_SERVICE_ROLE_KEY_PRODUCT}
-      SUPABASE_PRODUCTS_TABLE: ${SUPABASE_PRODUCTS_TABLE:-products}
+      PRODUCT_DB_HOST: ${PRODUCT_DB_HOST}
+      PRODUCT_DB_PORT: ${PRODUCT_DB_PORT:-5432}
+      PRODUCT_DB_USER: ${PRODUCT_DB_USER:-postgres}
+      PRODUCT_DB_PASSWORD: ${PRODUCT_DB_PASSWORD}
+      PRODUCT_DB_NAME: ${PRODUCT_DB_NAME:-postgres}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE:-false}
 
   user-service:
     image: ghcr.io/${GITHUB_REPOSITORY}/grocery-user-service:${IMAGE_TAG}
