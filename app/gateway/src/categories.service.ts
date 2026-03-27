@@ -1,7 +1,7 @@
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
-import {ApiResponse} from "@/lib/common/response.util"
+import {ApiResponse} from "../../../lib/common/response.util"
 import { CategoryDto } from './types/category.type';
 
 @Injectable()

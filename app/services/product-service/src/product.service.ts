@@ -3,9 +3,9 @@ import {
   InternalServerErrorException,
   OnModuleInit,
 } from '@nestjs/common';
-import { getSupabaseClient } from '@/lib/common/src/database/supabase.client';
+import { getSupabaseClient } from '../../../../lib/common/src/database/supabase.client';
 import { PRODUCT_SERVICE_TABLES } from './const/tables';
-import { ApiResponse, STATUS_CODE } from '@/lib/common/response.util';
+import { ApiResponse, STATUS_CODE } from '../../../../lib/common/response.util';
 import {ProductRow} from './types/product.type';
 
 @Injectable()
