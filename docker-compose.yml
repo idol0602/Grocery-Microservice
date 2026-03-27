@@ -61,3 +61,12 @@ services:
       ORDER_SERVICE_PORT: 4003
       SUPABASE_URL_ORDER: ${SUPABASE_URL_ORDER}
       SUPABASE_SERVICE_ROLE_KEY_ORDER: ${SUPABASE_SERVICE_ROLE_KEY_ORDER}
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
