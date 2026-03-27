@@ -2,8 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('products')
@@ -14,7 +12,7 @@ export class Product {
   @Column({ type: 'int', nullable: true })
   category_id!: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'text' })
   name!: string;
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
@@ -26,15 +24,12 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description!: string;
 
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: 'text', nullable: true })
   image_url!: string;
+
+  @Column({ type: 'timestamp with time zone', default: () => 'NOW()' })
+  created_at!: Date;
 
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
-
-  @CreateDateColumn({ type: 'timestamp with time zone' })
-  created_at!: Date;
-
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updated_at!: Date;
 }
